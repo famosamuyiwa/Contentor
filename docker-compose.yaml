@@ -1,0 +1,73 @@
+services:
+  reservations:
+    # Build Configuration:
+    build:
+      # The build context is the location of the Dockerfile and the context for the build.
+      context: .
+      # The path to the Dockerfile relative to the build context.
+      dockerfile: ./apps/reservations/Dockerfile
+      # The target stage to build from the Dockerfile. In this case, it's set to "development."
+      target: development
+
+    # Command to Run:
+    command: pnpm run start:dev reservations
+    # The command to run inside the container when it starts.
+
+    env_file:
+      - ./apps/reservations/.env
+
+    # Port Mapping:
+    ports:
+      - '3000:3000'
+      # Maps port 3000 inside the container to port 3000 on the host.
+      # This allows external access to the service running in the container.
+
+    # Volume Mounting:
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+      # Mounts the current directory on the host (the one where the Docker Compose file is located)
+      # into the container at /usr/src/app. This is often used for development to allow code changes
+      # on the host to be reflected inside the container without rebuilding the image.
+  
+  auth:
+    build:
+      context: .
+      dockerfile: ./apps/auth/Dockerfile
+      target: development
+    command: pnpm run start:dev auth
+    env_file:
+      - ./apps/auth/.env
+    ports:
+      - '3001:3001'
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+  
+  notifications:
+    build:
+      context: .
+      dockerfile: ./apps/notifications/Dockerfile
+      target: development
+    command: pnpm run start:dev notifications
+    env_file:
+      - ./apps/notifications/.env
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+
+  mongo:
+    image: mongo
+
+  rabbitmq:
+    image: rabbitmq
+    ports:
+      - '5272:5672'
+
+# Explanation:
+# - This configuration defines a service named "reservations."
+# - It specifies how to build the Docker image for this service from a Dockerfile.
+# - It sets the command to run when the container starts.
+# - It maps port 3000 inside the container to port 3000 on the host, enabling external access.
+# - It mounts the current directory (the one containing the Docker Compose file) into the container
+#   at the /usr/src/app directory, allowing for live code updates during development.

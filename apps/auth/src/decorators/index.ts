@@ -1,0 +1,1 @@
+export * from '../../../../libs/common/src/decorators/current-user.decorator'
