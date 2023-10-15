@@ -67,4 +67,5 @@ export class UsersService implements OnModuleInit{
     async getUser(getUserDto: GetUserDto){
         return this.usersRepository.findOne(getUserDto)
     }
+    
 }

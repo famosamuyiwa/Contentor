@@ -1,6 +1,5 @@
 import { Controller, Get, UsePipes, ValidationPipe } from '@nestjs/common';
 import { NotificationsService } from './notifications.service';
-import { Ctx, EventPattern, Payload, RmqContext } from '@nestjs/microservices';
 import { NotifyEmailDto } from '../dto/notify-email-dto';
 import { NotificationsServiceController, NotificationsServiceControllerMethods } from '@app/common';
 

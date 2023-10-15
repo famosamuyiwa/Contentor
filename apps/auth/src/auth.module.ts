@@ -2,11 +2,12 @@ import { Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { UsersModule } from './users/users.module';
-import { LoggerModule } from '@app/common';
+import { DatabaseModule, GrpcModule, LoggerModule, NOTIFICATIONS_PACKAGE_NAME, NOTIFICATIONS_SERVICE_NAME, UserDocument, UserSchema } from '@app/common';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi'
 import { JwtStrategy, LocalStrategy } from './strategy';
+import { UsersRepository } from './users/users.repository';
 
 @Module({
   imports: [
@@ -31,9 +32,18 @@ import { JwtStrategy, LocalStrategy } from './strategy';
         }
       }),
       inject:[ConfigService]
-  })
+  }),
+  GrpcModule,
+  GrpcModule.registerAsync(NOTIFICATIONS_SERVICE_NAME, 'NOTIFICATIONS_GRPC_URL', NOTIFICATIONS_PACKAGE_NAME),
+  DatabaseModule, 
+  DatabaseModule.forFeature([{ name: UserDocument.name, schema: UserSchema}]),
 ],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, JwtStrategy],
+  providers: [
+    AuthService,
+    LocalStrategy,
+    JwtStrategy,
+    UsersRepository
+  ],
 })
 export class AuthModule {}

@@ -1,9 +1,10 @@
-import { Controller, Post, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthServiceController, AuthServiceControllerMethods, CurrentUser, UserDocument } from '@app/common';
 import { Response } from 'express'
 import { JwtAuthGuard, localAuthGuard } from './guards';
 import {  Payload } from '@nestjs/microservices';
+import { SendOtpDTO } from './users/dto/send-otp.dto';
 
 @Controller("auth")
 @AuthServiceControllerMethods()
@@ -24,6 +25,12 @@ export class AuthController implements AuthServiceController{
       ...data.user,
       id: data.user._id
     }
+  }
+
+  //send otp
+  @Post('forgot-password')
+  async sendOTP(@Body() email: SendOtpDTO){
+    return this.authService.sendOTP(email)
   }
 
 }
