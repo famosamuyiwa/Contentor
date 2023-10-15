@@ -26,6 +26,12 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
+*********** make sure to install protoc on your system if needed ***********
+proto ts file generation example for notifications.proto: 
+
+protoc --plugin=protoc-gen-ts_proto=.\node_modules\.bin\protoc-gen-ts_proto.cmd --ts_proto_out=./ --ts_proto_opt=nestJs=true  ./proto/notifications.proto
+
+
 ## Installation
 
 ```bash

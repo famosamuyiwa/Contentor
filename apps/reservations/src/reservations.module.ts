@@ -1,13 +1,11 @@
 import { Module } from '@nestjs/common';
 import { ReservationsService } from './reservations.service';
 import { ReservationsController } from './reservations.controller';
-import { DatabaseModule, LoggerModule } from '@app/common';
+import { AUTH_PACKAGE_NAME, AUTH_SERVICE_NAME, DatabaseModule, GrpcModule, LoggerModule } from '@app/common';
 import { ReservationRepository } from './reservations.repository';
 import { ReservationDocument, ReservationSchema } from './models/reservation.schema';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi'
-import { Services } from '@app/common';
-import { RabbitMQModule } from '@app/common';
 
 @Module({
   imports: [
@@ -19,11 +17,11 @@ import { RabbitMQModule } from '@app/common';
       validationSchema: Joi.object({
         MONGODB_URI: Joi.string().required(),
         PORT: Joi.number().required(),
-        RABBITMQ_URI: Joi.string().required()
+        AUTH_GRPC_URL: Joi.string().required(),
       })
     }),
-    RabbitMQModule,
-    RabbitMQModule.registerAsync(Services.AUTH)
+    GrpcModule,
+    GrpcModule.registerAsync(AUTH_SERVICE_NAME, 'AUTH_GRPC_URL', AUTH_PACKAGE_NAME)
   ],
   controllers: [ReservationsController],
   providers: [ReservationsService, ReservationRepository],

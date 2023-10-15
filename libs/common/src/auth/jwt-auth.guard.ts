@@ -1,18 +1,22 @@
-import { CanActivate, ExecutionContext, Inject, Injectable, Logger, UnauthorizedException } from "@nestjs/common";
+import { CanActivate, ExecutionContext, Inject, Injectable, Logger, OnModuleInit, UnauthorizedException } from "@nestjs/common";
 import { Observable, catchError, map, of, tap } from "rxjs";
-import { Services } from "../enums/services";
-import { ClientProxy } from "@nestjs/microservices";
-import { UserDto } from "../dto";
+import { ClientGrpc } from "@nestjs/microservices";
 import { Reflector } from "@nestjs/core";
+import { AUTH_SERVICE_NAME, AuthServiceClient } from "../types";
 
 @Injectable()
-export class JwtAuthGuard implements CanActivate {
+export class JwtAuthGuard implements CanActivate, OnModuleInit {
     private readonly logger = new Logger(JwtAuthGuard.name)
+    private authService: AuthServiceClient
 
     constructor(
-        @Inject(Services.AUTH) private readonly authClient: ClientProxy,
+        @Inject(AUTH_SERVICE_NAME) private readonly client: ClientGrpc,
         private readonly reflector: Reflector
         ) {}
+
+    onModuleInit() {
+        this.authService = this.client.getService<AuthServiceClient>(AUTH_SERVICE_NAME)
+    }
 
     canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
         // Extract the JWT token from the request cookies
@@ -27,8 +31,8 @@ export class JwtAuthGuard implements CanActivate {
 
         const roles = this.reflector.get<string[]>('roles', context.getHandler())
 
-        // Send an 'authenticate' request to the authentication service via a ClientProxy
-        return this.authClient.send<UserDto>('authenticate', {
+        // Send an 'authenticate' request to the authentication service via authService grpc client
+        return this.authService.authenticate({
             Authentication: jwt
         }).pipe(
             // Use 'tap' to manipulate the request context
@@ -43,9 +47,12 @@ export class JwtAuthGuard implements CanActivate {
                     }
                 }
                 // Set the user in the request context to the response from the authentication service
-                context.switchToHttp().getRequest().user = res;
+                context.switchToHttp().getRequest().user = {
+                    ...res,
+                    _id: res.id
+                };
             }),
-            // Map the result to 'true' to indicate successful authentication
+            // Map the result to 'true' to indicate successful authentication or false if error 
             map(() => true),
             catchError((err) => {
                 this.logger.error(err)

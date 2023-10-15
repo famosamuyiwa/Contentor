@@ -1,12 +1,13 @@
-import { Controller, Get, Post, Res, UseGuards } from '@nestjs/common';
+import { Controller, Post, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CurrentUser, UserDocument } from '@app/common';
+import { AuthServiceController, AuthServiceControllerMethods, CurrentUser, UserDocument } from '@app/common';
 import { Response } from 'express'
 import { JwtAuthGuard, localAuthGuard } from './guards';
-import { MessagePattern, Payload } from '@nestjs/microservices';
+import {  Payload } from '@nestjs/microservices';
 
 @Controller("auth")
-export class AuthController {
+@AuthServiceControllerMethods()
+export class AuthController implements AuthServiceController{
   constructor(private readonly authService: AuthService) {}
 
   @UseGuards(localAuthGuard)
@@ -16,11 +17,13 @@ export class AuthController {
     response.send(user)
   }
 
-  //authentication service exposed as a client proxy
+  //authentication service exposed as a client grpc
   @UseGuards(JwtAuthGuard)
-  @MessagePattern('authenticate')
   async authenticate(@Payload() data: any){
-    return data.user
+    return {
+      ...data.user,
+      id: data.user._id
+    }
   }
 
 }

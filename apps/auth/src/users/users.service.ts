@@ -1,19 +1,25 @@
-import { Inject, Injectable, UnauthorizedException, UnprocessableEntityException } from '@nestjs/common';
+import { Inject, Injectable, OnModuleInit, UnauthorizedException, UnprocessableEntityException } from '@nestjs/common';
 import { CreateUserDto } from './dto';
 import { UsersRepository } from './users.repository';
 import * as bcrypt from 'bcryptjs'
 import { GetUserDto } from './dto/get-user.dto';
-import { Services } from '@app/common';
-import { ClientProxy } from '@nestjs/microservices';
+import { NOTIFICATIONS_SERVICE_NAME, NotificationsServiceClient } from '@app/common';
+import { ClientGrpc } from '@nestjs/microservices';
 
 
 @Injectable()
-export class UsersService {
+export class UsersService implements OnModuleInit{
+
+    private notificationsService: NotificationsServiceClient
+
     constructor(
         private readonly usersRepository: UsersRepository, 
-        @Inject(Services.NOTIFICATIONS)
-        private readonly notificationsService: ClientProxy
+        @Inject(NOTIFICATIONS_SERVICE_NAME) private readonly client: ClientGrpc,
     ){}
+
+    onModuleInit() {
+        this.notificationsService = this.client.getService<NotificationsServiceClient>(NOTIFICATIONS_SERVICE_NAME)
+    }
 
     async create(createUserDto: CreateUserDto){
         
@@ -22,7 +28,9 @@ export class UsersService {
         await this.validateCreateUserDto(createUserDto)
         
         // send email on successful user creation 
-        this.notificationsService.emit('notify_email', { email: createUserDto.email, text: "Some Test text"})
+        this.notificationsService
+        .notifyEmail({ email: createUserDto.email, text: "Some Test text"})
+        .subscribe(() => {})
 
         return this.usersRepository.create(
             {

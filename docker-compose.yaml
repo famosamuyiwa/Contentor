@@ -59,10 +59,6 @@ services:
   mongo:
     image: mongo
 
-  rabbitmq:
-    image: rabbitmq
-    ports:
-      - '5272:5672'
 
 # Explanation:
 # - This configuration defines a service named "reservations."

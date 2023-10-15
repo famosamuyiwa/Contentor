@@ -19,7 +19,8 @@ import { JwtStrategy, LocalStrategy } from './strategy';
         JWT_SECRET: Joi.string().required(),
         JWT_EXPIRATION: Joi.string().required(),
         HTTP_PORT: Joi.number().required(),
-        RABBITMQ_URI: Joi.string().required()
+        NOTIFICATIONS_GRPC_URL: Joi.string().required(),
+        AUTH_GRPC_URL: Joi.string().required(),
       })
     }) ,
     JwtModule.registerAsync({

@@ -1,21 +1,22 @@
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { Services } from '../enums';
+import { join } from 'path';
 
 @Module({
     imports: [ClientsModule]
 })
-export class RabbitMQModule {
-    static registerAsync(service: Services){
+export class GrpcModule {
+    static registerAsync(serviceName: string, url: string, packageName: string){
         return ClientsModule.registerAsync([
                 { 
-                name: service,
+                name: serviceName,
                 useFactory: (configService: ConfigService) => ({
-                    transport: Transport.RMQ,
+                    transport: Transport.GRPC,
                     options:{
-                    urls: [configService.getOrThrow<string>('RABBITMQ_URI')],
-                    queue: service
+                        package: packageName,
+                        protoPath: join(__dirname, `../../../../../../../proto/${packageName}.proto`),
+                        url: configService.getOrThrow(url)
                     }
                 }),
                 inject:[ConfigService]
