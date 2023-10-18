@@ -15,4 +15,5 @@ message UserMessage {
     string email = 2;
     string password = 3;
     repeated string roles = 4;
+    string username = 5;
 }

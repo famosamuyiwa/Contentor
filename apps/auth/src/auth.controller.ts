@@ -4,12 +4,16 @@ import { AuthServiceController, AuthServiceControllerMethods, CurrentUser, UserD
 import { Response } from 'express'
 import { JwtAuthGuard, localAuthGuard } from './guards';
 import {  Payload } from '@nestjs/microservices';
-import { SendOtpDTO } from './users/dto/send-otp.dto';
+import { SendOtpDTO } from './otp/dto';
+import { OtpService } from './otp/otp.service';
 
 @Controller("auth")
 @AuthServiceControllerMethods()
 export class AuthController implements AuthServiceController{
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly otpService: OtpService,
+    ) {}
 
   @UseGuards(localAuthGuard)
   @Post('login')
@@ -29,8 +33,10 @@ export class AuthController implements AuthServiceController{
 
   //send otp
   @Post('forgot-password')
-  async sendOTP(@Body() email: SendOtpDTO){
-    return this.authService.sendOTP(email)
+  async sendForgotPasswordOTP(@Body() email: SendOtpDTO){
+    return this.otpService.sendOTP(email)
   }
+
+  
 
 }

@@ -3,7 +3,7 @@ import { NotificationsModule } from './notifications.module';
 import { Logger } from 'nestjs-pino';
 import { Transport } from '@nestjs/microservices';
 import { ConfigService } from '@nestjs/config';
-import { NOTIFICATIONS_PACKAGE_NAME, Services } from '@app/common';
+import { NOTIFICATIONS_PACKAGE_NAME} from '@app/common';
 import { join } from 'path';
 
 async function bootstrap() {
@@ -19,5 +19,6 @@ async function bootstrap() {
   })
   app.useLogger(app.get(Logger))
   await app.startAllMicroservices()
+
 }
 bootstrap();

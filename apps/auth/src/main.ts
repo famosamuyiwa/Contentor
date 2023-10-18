@@ -11,6 +11,9 @@ import { join } from 'path';
 async function bootstrap() {
   const app = await NestFactory.create(AuthModule);
   const configService = app.get(ConfigService)
+  app.useGlobalPipes(new ValidationPipe({
+    whitelist: true
+  }))
   app.connectMicroservice({ 
     transport: Transport.GRPC,
     options:{

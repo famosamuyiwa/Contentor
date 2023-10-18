@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
-import { DatabaseModule, GrpcModule, NOTIFICATIONS_PACKAGE_NAME, NOTIFICATIONS_SERVICE_NAME, Services, UserDocument, UserSchema } from '@app/common';
+import { DatabaseModule, GrpcModule, NOTIFICATIONS_PACKAGE_NAME, NOTIFICATIONS_SERVICE_NAME, UserDocument, UserSchema } from '@app/common';
 import { UsersRepository } from './users.repository';
 
 
