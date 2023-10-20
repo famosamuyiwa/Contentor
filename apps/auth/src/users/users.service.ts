@@ -1,4 +1,4 @@
-import { BadRequestException, Inject, Injectable, OnModuleInit, UnauthorizedException, UnprocessableEntityException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, OnModuleInit, ServiceUnavailableException, UnauthorizedException, UnprocessableEntityException } from '@nestjs/common';
 import { CreateUserDto } from './dto';
 import { UsersRepository } from './users.repository';
 import * as bcrypt from 'bcryptjs'
@@ -31,9 +31,14 @@ export class UsersService implements OnModuleInit{
         await this.validateCreateUserDto(createUserDto)
         
         // send email on successful user creation 
-        this.notificationsService
-        .notifyEmail({ email: createUserDto.email, text: "Some Test text"})
-        .subscribe(() => {})
+        try{
+            this.notificationsService
+            .notifyEmail({ email: createUserDto.email, text: "Some Test text"})
+            .subscribe(() => {})
+        }catch(err){
+            throw new ServiceUnavailableException(err)
+        }
+     
 
         const user = await this.usersRepository.create(
             {
@@ -67,6 +72,7 @@ export class UsersService implements OnModuleInit{
                 {username: usernameOrEmail} 
             ]
         })
+
         const passwordIsValid = await bcrypt.compare(password, user.password)
 
         if(!passwordIsValid){

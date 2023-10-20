@@ -12,6 +12,7 @@ import { OtpService } from './otp/otp.service';
 import { OtpModule } from './otp/otp.module';
 import { OtpRepository } from './otp/otp.repository';
 import { OtpDocument, OtpSchema } from '@app/common/models/otp.schema';
+import { RefreshJwtStrategy } from './strategy/refresh-token.strategy';
 
 @Module({
   imports: [
@@ -23,7 +24,8 @@ import { OtpDocument, OtpSchema } from '@app/common/models/otp.schema';
       validationSchema: Joi.object({
         MONGODB_URI: Joi.string().required(),
         JWT_SECRET: Joi.string().required(),
-        JWT_EXPIRATION: Joi.string().required(),
+        JWT_EXPIRATION: Joi.number().required(),
+        JWT_REFRESH_EXPIRATION: Joi.number().required(),
         HTTP_PORT: Joi.number().required(),
         NOTIFICATIONS_GRPC_URL: Joi.string().required(),
         AUTH_GRPC_URL: Joi.string().required(),
@@ -49,6 +51,7 @@ import { OtpDocument, OtpSchema } from '@app/common/models/otp.schema';
     OtpService,
     LocalStrategy,
     JwtStrategy,
+    RefreshJwtStrategy,
     OtpRepository
     ],
 })

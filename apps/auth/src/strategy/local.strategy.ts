@@ -6,7 +6,9 @@ import { Strategy } from "passport-local"
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy, 'local'){
     constructor(private readonly userService: UsersService){
-        super()
+        super({
+            usernameField: 'email' , // email is the key used, but value can either be email or username when calling
+          })        
     }
 
     //check if user exists and credentials match
@@ -19,22 +21,4 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local'){
         }
     }
 
-    // async validate(usernameOrEmail: string, password: string): Promise<any> {
-    //     // Determine if usernameOrEmail is an email or a username
-    //     const isEmail = usernameOrEmail.includes('@');
-        
-    //     let user;
-        
-    //     if (isEmail) {
-    //       user = await this.authService.validateUserByEmail(usernameOrEmail, password);
-    //     } else {
-    //       user = await this.authService.validateUserByUsername(usernameOrEmail, password);
-    //     }
-        
-    //     if (!user) {
-    //       throw new UnauthorizedException('Invalid credentials');
-    //     }
-        
-    //     return user;
-    //   }
 }

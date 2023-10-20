@@ -1,8 +1,8 @@
-import { Body, Controller, Post, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthServiceController, AuthServiceControllerMethods, CurrentUser, UserDocument } from '@app/common';
 import { Response } from 'express'
-import { JwtAuthGuard, localAuthGuard } from './guards';
+import { JwtAuthGuard, RefreshJwtGuard, localAuthGuard } from './guards';
 import {  Payload } from '@nestjs/microservices';
 import { SendOtpDTO } from './otp/dto';
 import { OtpService } from './otp/otp.service';
@@ -19,6 +19,13 @@ export class AuthController implements AuthServiceController{
   @Post('login')
   async login(@CurrentUser() user: UserDocument, @Res({ passthrough: true}) response: Response){
     await this.authService.login(user, response)
+    response.send(user)
+  }
+
+  @UseGuards(RefreshJwtGuard)
+  @Get('refresh')
+  async refreshToken(@CurrentUser() user: UserDocument, @Res({ passthrough: true}) response: Response){
+    await this.authService.refreshToken(user, response)
     response.send(user)
   }
 
